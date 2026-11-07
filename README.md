@@ -26,7 +26,7 @@ dotfiles/
 │       └── prompt.zsh       #   プロンプト（git ブランチ表示）
 ├── config/
 │   ├── ghostty/config       # Ghostty（Option を Alt として使う・フォント・テーマ）
-│   └── mise/config.toml     # mise グローバルツール（node LTS, python, go, rust, gh, kubectl, rg, jq, yq, fd, bat）
+│   └── mise/config.toml     # mise グローバルツール（node LTS, python, go, rust, gh, kubectl, rg, jq, yq, fd, bat, ghq）
 └── scripts/
     └── install.sh           # セットアップスクリプト（冪等・バックアップ付き）
 ```

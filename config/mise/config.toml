@@ -20,3 +20,4 @@ jq = "latest"
 yq = "latest"           # YAML 版 jq（mikefarah/yq）
 fd = "latest"
 bat = "latest"
+ghq = "latest"          # リポジトリを ~/ghq/<host>/<owner>/<repo> に clone・管理する（ghq get / ghq list）
