@@ -100,23 +100,54 @@ func push(dir string) error {
 func newPullCmd() *cobra.Command {
 	return &cobra.Command{
 		Use:   "pull",
-		Short: "リモートの変更を取り込み（fast-forward のみ）、必要なら dots install を実行する",
+		Short: "リモートの変更を取り込む（fast-forward のみ。反映はしない）",
 		Long: `リモートの変更を取り込む（git pull --ff-only）。
 
 fast-forward できない（手元とリモートの両方にコミットがある）ときは何もせず止まる。
-取り込んだ後、Brewfile や mise の設定を反映するために dots install を実行するか確認する。`,
+Brewfile や mise の設定は反映しないので、反映もするなら dots sync を使う。`,
 		Args: cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			dir, err := repoDir()
 			if err != nil {
 				return err
 			}
-			return pull(dir)
+			changed, err := pull(dir)
+			if err != nil {
+				return err
+			}
+			if changed {
+				fmt.Println("\n取り込んだ設定を反映するには dots install を実行してください")
+			}
+			return nil
 		},
 	}
 }
 
-func pull(dir string) error {
+func newSyncCmd() *cobra.Command {
+	return &cobra.Command{
+		Use:   "sync",
+		Short: "リモートの変更を取り込み、dots install で反映する（pull + install）",
+		Long: `dots pull でリモートの変更を取り込んでから、dots install で反映する。
+
+install は冪等なので、取り込む変更が無くても実行する（手元の設定を反映し直すのにも使える）。
+pull が失敗したときは install しない。`,
+		Args: cobra.NoArgs,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			dir, err := repoDir()
+			if err != nil {
+				return err
+			}
+			if _, err := pull(dir); err != nil {
+				return err
+			}
+			fmt.Println()
+			return install(dir, false)
+		},
+	}
+}
+
+// pull は fast-forward でリモートの変更を取り込み、HEAD が進んだかを返す
+func pull(dir string) (bool, error) {
 	if st, _ := output(dir, "git", "status", "--short"); st != "" {
 		fmt.Println("未コミットの変更があります（取り込む変更と重なると pull は失敗します）")
 		fmt.Println(st)
@@ -124,25 +155,17 @@ func pull(dir string) error {
 
 	before, err := output(dir, "git", "rev-parse", "HEAD")
 	if err != nil {
-		return err
+		return false, err
 	}
+	// 取り込んだファイルの一覧は git pull が表示する
 	if err := run(dir, "git", "pull", "--ff-only"); err != nil {
-		return err
+		return false, err
 	}
 	after, err := output(dir, "git", "rev-parse", "HEAD")
 	if err != nil {
-		return err
+		return false, err
 	}
-	// 取り込んだファイルの一覧は git pull が表示している
-	if before == after {
-		return nil
-	}
-
-	if !confirm("取り込んだ変更を反映するため dots install を実行しますか?") {
-		fmt.Println("dots install はあとで実行できます")
-		return nil
-	}
-	return install(dir, false)
+	return before != after, nil
 }
 
 func newStatusCmd() *cobra.Command {

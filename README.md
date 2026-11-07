@@ -78,7 +78,8 @@ dotfiles をどこからでも操作できるコマンド。コミット・push 
 | `dots status` | 未コミットの変更と未 push のコミットを表示 |
 | `dots commit "<メッセージ>"` | 差分を確認してコミット |
 | `dots push` | 未 push のコミットを確認して push |
-| `dots pull` | リモートの変更を取り込み、`dots install` するか確認 |
+| `dots pull` | リモートの変更を取り込む（反映はしない） |
+| `dots sync` | `pull` してから `install` まで行う |
 | `dots install` | `install.sh` を実行（`--dry-run` で確認のみ） |
 | `dots mise add <名前>` / `rm` | mise のツールを追加・削除してコミット |
 | `dots brew add <名前>` / `rm` | Brewfile に追加・削除してコミット（cask は `--cask`） |

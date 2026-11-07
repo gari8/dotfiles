@@ -31,7 +31,7 @@ func main() {
 		Example: `  dots status                 # 未コミットの変更・未 push のコミットを確認
   dots commit "add lazygit"   # 差分を確認してコミット
   dots push                   # 未 push のコミットを確認して push
-  dots pull                   # pull して、必要なら install
+  dots sync                   # pull して install（別の Mac での変更を反映）
   dots mise add lazygit       # mise に追加してコミット
   dots brew add --cask arc    # Brewfile に追加してインストールしてコミット
   cd "$(dots path)"           # dotfiles に移動`,
@@ -44,6 +44,7 @@ func main() {
 		newCommitCmd(),
 		newPushCmd(),
 		newPullCmd(),
+		newSyncCmd(),
 		newStatusCmd(),
 		newInstallCmd(),
 		newPathCmd(),
