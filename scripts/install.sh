@@ -97,4 +97,26 @@ else
 fi
 
 info ""
+info "== dots コマンド =="
+# cmd/dots をビルドして ~/.local/bin/dots に置く（Go は上の mise install で入る）
+# 実行中の dots 自身を上書きしても壊れないよう、一時ファイルにビルドしてから mv で置き換える
+DOTS_BIN="$HOME/.local/bin/dots"
+if ! command -v mise >/dev/null 2>&1; then
+  info "  SKIP: mise が見つかりません"
+elif $DRY_RUN; then
+  info "  [dry-run] go build ./cmd/dots -> $DOTS_BIN"
+else
+  mkdir -p "$(dirname "$DOTS_BIN")"
+  tmp="$(mktemp "$DOTS_BIN.XXXXXX")"
+  if (cd "$DOTFILES_DIR" && mise exec -- go build -ldflags "-X 'main.defaultDir=$DOTFILES_DIR'" -o "$tmp" ./cmd/dots); then
+    mv -f "$tmp" "$DOTS_BIN"
+    info "  OK:   $DOTS_BIN"
+  else
+    rm -f "$tmp"
+    info "  FAILED: dots のビルドに失敗しました"
+    exit 1
+  fi
+fi
+
+info ""
 info "完了。新しいシェルを開くか 'exec \$SHELL -l' で設定を反映してください。"

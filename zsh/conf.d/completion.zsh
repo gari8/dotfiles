@@ -9,6 +9,11 @@ fi
 autoload -Uz compinit
 compinit
 
+# dots コマンドの補完（compinit の後に読み込む）
+if (( $+commands[dots] )); then
+  source <(dots completion zsh)
+fi
+
 # 補完候補に色をつける
 zstyle ':completion:*' list-colors "${LS_COLORS}"
 # 補完候補を矢印キーで選択できるようにする
