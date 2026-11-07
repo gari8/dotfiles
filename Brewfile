@@ -9,7 +9,6 @@ brew "mas"        # Mac App Store の CLI（下の mas 行に必要。App Store 
 
 # --- GUIアプリ ---
 cask "ghostty"    # ターミナルエミュレータ
-cask "herdr-app"  # Herdr — ターミナル・コーディングエージェント用デスクトップアプリ
 cask "clipy"      # クリップボード履歴（初回起動時にアクセシビリティの許可が必要）
 cask "rectangle"  # キーボードショートカットでウィンドウを整列（同上）
 cask "unity-hub"  # Unity Hub — エディタ本体はプロジェクトに合わせて Hub から入れる

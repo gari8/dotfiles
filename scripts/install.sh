@@ -39,7 +39,8 @@ link() {
 
   # すでに正しいリンクなら何もしない（冪等）
   if [[ -L "$dst" && "$(readlink "$dst")" == "$src" ]]; then
-    info "  OK:   $dst（リンク済み）"
+    # 変数の直後に全角文字が続くと bash 3.2 が変数名の一部と誤読するので ${} で囲む
+    info "  OK:   ${dst}（リンク済み）"
     return
   fi
 
