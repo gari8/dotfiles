@@ -19,3 +19,6 @@ unset _conf
 
 # マシン固有の設定・秘密情報はリポジトリ外の ~/.zshrc.local に書く
 [[ -f "$HOME/.zshrc.local" ]] && source "$HOME/.zshrc.local"
+
+# Unity CLI
+. "/Users/hayato.hagari/.unity/env"
