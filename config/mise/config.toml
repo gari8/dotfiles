@@ -1,0 +1,22 @@
+# mise グローバル設定（~/.config/mise/config.toml にリンクされる）
+# 言語ランタイムとCLIツールはここで管理する
+# 反映: mise install
+# プロジェクトごとに固定したい場合は各リポジトリの mise.toml / .mise.toml を使う
+
+[tools]
+# --- 言語ランタイム ---
+node = "lts"
+python = "latest"
+go = "latest"
+# Rust は mise が rustup 経由で入れる（cargo / rustc / clippy / rustfmt 付き）
+# rust-analyzer はエディタの補完用に追加コンポーネントとして入れる
+rust = { version = "stable", components = "rust-analyzer" }
+
+# --- CLIツール ---
+gh = "latest"           # GitHub CLI（registry 上の正式名は github-cli）
+kubectl = "latest"      # エイリアス k で呼べる
+ripgrep = "latest"
+jq = "latest"
+yq = "latest"           # YAML 版 jq（mikefarah/yq）
+fd = "latest"
+bat = "latest"

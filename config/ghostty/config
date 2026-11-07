@@ -1,0 +1,14 @@
+# Ghostty 設定（~/.config/ghostty/config にリンクされる）
+# キー一覧: https://ghostty.org/docs/config/reference
+# テーマ一覧: ghostty +list-themes / フォント一覧: ghostty +list-fonts
+
+# macOS の Option キーを Alt/Meta として使う
+# （true / false / left / right が指定可能）
+macos-option-as-alt = true
+
+# フォント（JetBrains Mono は Ghostty に同梱されているデフォルトフォント）
+font-family = JetBrains Mono
+font-size = 14
+
+# テーマ（OS のライト/ダークモードに自動追従）
+theme = light:Catppuccin Latte,dark:Catppuccin Mocha

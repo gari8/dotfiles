@@ -1,0 +1,9 @@
+# マシン固有・秘密情報を含むファイルはコミットしない
+.zshrc.local
+*.local
+.env
+.env.*
+*.pem
+*.key
+credentials*
+.DS_Store
