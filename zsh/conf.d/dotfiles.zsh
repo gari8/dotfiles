@@ -45,3 +45,43 @@ mise-add() {
   fi
   mise use -g "$@" && dotsave "mise: add $*"
 }
+
+# dotfiles のまだ push していないコミットを確認して push する（cd しないので今いる場所はそのまま）
+#   dotpush
+dotpush() {
+  # 未コミットの変更があれば先に dotsave するよう促す（push 自体は止めない）
+  if [[ -n "$(git -C "$DOTFILES_DIR" status --porcelain)" ]]; then
+    echo "未コミットの変更があります（push されません。先に dotsave でコミットできます）"
+    git -C "$DOTFILES_DIR" status --short
+  fi
+
+  # upstream が無い（初回 push）ときは origin に同名ブランチで push する
+  if ! git -C "$DOTFILES_DIR" rev-parse --abbrev-ref --symbolic-full-name '@{u}' >/dev/null 2>&1; then
+    if read -q "?upstream がありません。origin に push しますか? [y/N] "; then
+      echo
+      git -C "$DOTFILES_DIR" push -u origin HEAD
+    else
+      echo
+      echo "push しませんでした"
+      return 1
+    fi
+    return
+  fi
+
+  local commits
+  commits="$(git -C "$DOTFILES_DIR" log --oneline '@{u}..HEAD')"
+  if [[ -z "$commits" ]]; then
+    echo "push するコミットはありません"
+    return 0
+  fi
+
+  echo "$commits"
+  if read -q "?これらのコミットを push しますか? [y/N] "; then
+    echo
+    git -C "$DOTFILES_DIR" push
+  else
+    echo
+    echo "push しませんでした"
+    return 1
+  fi
+}

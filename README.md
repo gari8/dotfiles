@@ -20,7 +20,7 @@ dotfiles/
 │   └── conf.d/              # 役割別のシェル設定
 │       ├── aliases.zsh      #   エイリアス
 │       ├── completion.zsh   #   補完
-│       ├── dotfiles.zsh     #   dotsave / mise-add / dotinstall（dotfiles の更新・コミット・再セットアップ）
+│       ├── dotfiles.zsh     #   dotsave / dotpush / mise-add / dotinstall（dotfiles の更新・コミット・push・再セットアップ）
 │       ├── history.zsh      #   履歴
 │       ├── options.zsh      #   シェルオプション
 │       └── prompt.zsh       #   プロンプト（git ブランチ表示）
@@ -79,7 +79,8 @@ exec $SHELL -l
 | マシン固有・秘密情報 | `~/.zshrc.local`（コミットしない） | 同上 |
 
 CLI ツールは `mise-add <名前>` で「`mise use -g` → 差分を確認 → コミット」までまとめて行える。
-手で設定を書き換えたときは `dotsave "<メッセージ>"` で差分を確認してコミットする（どちらもどこからでも実行でき、y で確定）。
+手で設定を書き換えたときは `dotsave "<メッセージ>"` で差分を確認してコミットする。
+コミットしたら `dotpush` で未 push のコミットを確認して push する（いずれもどこからでも実行でき、y で確定）。
 
 - 名前は推測せず `brew search <名前>` / `mise registry | grep <名前>` で確認してから書く
 - プロジェクト固有のランタイムは、ここではなく各リポジトリの `mise.toml` に書く
