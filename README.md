@@ -49,7 +49,7 @@ dotfiles/
 xcode-select --install
 
 # 2. リポジトリを取得
-git clone <このリポジトリのURL> ~/dotfiles
+git clone git@github.com:gari8/dotfiles.git ~/dotfiles
 
 # 3. セットアップ（まず dry-run で内容確認を推奨）
 ~/dotfiles/scripts/install.sh --dry-run
