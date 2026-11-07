@@ -4,6 +4,10 @@
 # dotfiles リポジトリの場所（DOTFILES_ZSH_DIR は .zshrc で設定される）
 DOTFILES_DIR="${DOTFILES_ZSH_DIR:h}"
 
+# セットアップスクリプトを実行する（dotinstall --dry-run で確認のみ）
+# シングルクォートなので、実行するたびにその時点の DOTFILES_DIR を使う
+alias dotinstall='"$DOTFILES_DIR/scripts/install.sh"'
+
 # dotfiles の変更を確認してコミットする（cd しないので今いる場所はそのまま）
 #   dotsave "add lazygit"
 dotsave() {

@@ -20,7 +20,7 @@ dotfiles/
 │   └── conf.d/              # 役割別のシェル設定
 │       ├── aliases.zsh      #   エイリアス
 │       ├── completion.zsh   #   補完
-│       ├── dotfiles.zsh     #   dotsave / mise-add（dotfiles の更新とコミット）
+│       ├── dotfiles.zsh     #   dotsave / mise-add / dotinstall（dotfiles の更新・コミット・再セットアップ）
 │       ├── history.zsh      #   履歴
 │       ├── options.zsh      #   シェルオプション
 │       └── prompt.zsh       #   プロンプト（git ブランチ表示）
@@ -66,7 +66,7 @@ exec $SHELL -l
 3. `brew bundle` で Brewfile の内容をインストール
 4. `mise install` でグローバルツールをインストール
 
-何度実行しても安全です。
+何度実行しても安全です。セットアップ後は `dotinstall`（`dotinstall --dry-run`）でどこからでも再実行できます。
 
 ## ツールを追加するときのルール
 
