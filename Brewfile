@@ -23,6 +23,7 @@ cask "bambu-studio"    # Bambu Lab の 3D プリンタ用スライサー
 cask "jlcone"          # JLC ONE — JLCPCB の見積もり・注文・注文追跡
 cask "docker-desktop"  # Docker Desktop（docker / docker compose コマンドも入る）
 cask "discord"         # チャット
+cask "kicad"
 
 # --- Mac App Store ---
 mas "Xcode", id: 497799835  # Unity の iOS / Mac ビルドに必要。容量が大きく時間がかかる
