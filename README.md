@@ -50,35 +50,39 @@ dotfiles/
 # 1. Command Line Tools（git が入る）
 xcode-select --install
 
-# 2. dots を入れる（~/.local/bin/dots）
+# 2. Homebrew を入れる（https://brew.sh の1行。最後に表示されるコマンドも実行する）
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+
+# 3. dots を入れる（~/.local/bin/dots）
 curl -fsSL https://raw.githubusercontent.com/gari8/dotfiles-cli/main/install.sh | sh
 
-# 3. このリポジトリを ~/dotfiles に clone して登録
+# 4. このリポジトリを ~/dotfiles に clone して登録
 #    まだ SSH 鍵が無いので HTTPS で取る（公開リポジトリなので認証不要）
 ~/.local/bin/dots init --from https://github.com/gari8/dotfiles.git
 #    （SSH 鍵を GitHub に登録済みなら git@github.com:gari8/dotfiles.git でも可）
 
-# 4. セットアップ（まず -n で内容確認を推奨）
+# 5. セットアップ（まず -n で内容確認を推奨）
 ~/.local/bin/dots install -n
 ~/.local/bin/dots install
 
-# 5. シェルを再起動して反映
+# 6. シェルを再起動して反映
 exec $SHELL -l
 ```
 
 `dots install` がやること（何度実行しても安全）:
 
 1. `dots.toml` の `[links]` のシンボリックリンクを作成（既存ファイルは `~/.dotfiles_backup/<日時>/` に退避）
-2. Homebrew が無ければ確認の上インストールし、`brew bundle` で2つの Brewfile の足りないものを入れる
+2. `brew bundle` で2つの Brewfile の足りないものを入れる（Homebrew は手順 2 で先に入れておく）
 3. `mise install` でグローバルツールを入れる
+4. シェルの設定に足りない行があれば表示する（このリポジトリの `zsh/` にはもう入っているので、通常は ok になる）
 
 push するには GitHub への認証が必要。SSH 鍵を作って GitHub に登録し、`git -C ~/dotfiles remote set-url origin git@github.com:gari8/dotfiles.git` で SSH に切り替える（または `gh auth login`）。
 
-`dots` 自体は mise ではなく `~/.local/bin/dots` に置く。更新するときは手順 2 の `curl ... | sh` をもう一度実行する。
+`dots` 自体は mise ではなく `~/.local/bin/dots` に置く。更新するときは手順 3 の `curl ... | sh` をもう一度実行する。
 
 ## この設定を取り込む（他の人向け）
 
-どの方法も、先に [dots](https://github.com/gari8/dotfiles-cli) を入れておく。
+どの方法も、先に Command Line Tools・[Homebrew](https://brew.sh)・[dots](https://github.com/gari8/dotfiles-cli) を入れておく。
 
 ```sh
 curl -fsSL https://raw.githubusercontent.com/gari8/dotfiles-cli/main/install.sh | sh
