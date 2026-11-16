@@ -28,6 +28,7 @@ dotfiles/
 │   ├── ghostty/config       # Ghostty（Option を Alt として使う・フォント・テーマ）
 │   └── mise/config.toml     # mise グローバルツール（node LTS, python, go, rust, gh, kubectl, rg, jq, yq, fd, bat, ghq）
 ├── cmd/dots/                # dots コマンド（Go）
+├── dots.toml                # dots のカスタムコマンド
 └── scripts/
     └── install.sh           # セットアップスクリプト（冪等・バックアップ付き）
 ```
@@ -72,21 +73,20 @@ exec $SHELL -l
 
 ## dots コマンド
 
-dotfiles をどこからでも操作できるコマンド。コミット・push の前に内容を見せて確認する（`-y` で省略）。
+dotfiles をどこからでも操作できるコマンド。確認は `-y` で省略できる。
 
 | コマンド | やること |
 | --- | --- |
-| `dots status` | 未コミットの変更と未 push のコミットを表示 |
-| `dots commit "<メッセージ>"` | 差分を確認してコミット |
-| `dots push` | 未 push のコミットを確認して push |
-| `dots pull` | リモートの変更を取り込む（反映はしない） |
-| `dots sync` | `pull` してから `install` まで行う |
+| `dots list [--mise\|--brew]` | 管理しているツールと導入状況（✓ / ✗）を表示 |
 | `dots install` | `install.sh` を実行（`--dry-run` で確認のみ） |
-| `dots mise add <名前>` / `rm` | mise のツールを追加・削除してコミット |
-| `dots brew add <名前>` / `rm` | Brewfile に追加・削除してコミット（cask は `--cask`） |
+| `dots upgrade [--mise\|--brew]` | 更新できるものを表示し、y で更新（`-n` で表示のみ、`-x a,b` で除外） |
+| `dots add --mise\|--brew\|--cask <名前>` | インストールして設定に追加し、コミット |
+| `dots rm --mise\|--brew\|--cask <名前>` | 設定から削除してコミット |
 | `dots path` | dotfiles のパスを表示（`cd "$(dots path)"`） |
+| `dots cmd <名前>` | `dots.toml` のカスタムコマンドを実行（`dots cmd list` で一覧） |
 
-詳しくは `dots --help` / `dots <コマンド> --help`。
+git の操作は `dots cmd status` / `commit` / `push` / `pull` / `sync` など（`dots.toml` に定義。書き方は同ファイル冒頭）。
+詳しくは `dots --help`。
 
 ## キーバインド（fzf）
 
@@ -107,8 +107,8 @@ dotfiles をどこからでも操作できるコマンド。コミット・push 
 | エイリアス・シェル設定 | `zsh/conf.d/*.zsh`（役割に合うファイル、無ければ新規作成） | `exec $SHELL -l` |
 | マシン固有・秘密情報 | `~/.zshrc.local`（コミットしない） | 同上 |
 
-追加は `dots mise add` / `dots brew add` を使うと、インストールからコミットまでまとめて行える。
-手で書き換えたときは `dots commit` でコミットし、`dots push` で push する。
+追加は `dots add` を使うと、インストールからコミットまでまとめて行える。
+手で書き換えたときは `dots cmd commit <メッセージ>` → `dots cmd push`。
 
 - 名前は推測せず `brew search <名前>` / `mise registry | grep <名前>` で確認してから書く
 - プロジェクト固有のランタイムは、ここではなく各リポジトリの `mise.toml` に書く

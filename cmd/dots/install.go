@@ -11,12 +11,8 @@ func newInstallCmd() *cobra.Command {
 	var dryRun bool
 	cmd := &cobra.Command{
 		Use:   "install",
-		Short: "セットアップスクリプト（scripts/install.sh）を実行する",
-		Long: `セットアップスクリプト scripts/install.sh を実行する。
-
-シンボリックリンクの作成、brew bundle、mise install、dots 自身のビルドを行う。
-何度実行しても安全（冪等）。新しい Mac では dots がまだ無いので scripts/install.sh を直接実行する。`,
-		Args: cobra.NoArgs,
+		Short: "scripts/install.sh を実行する",
+		Args:  cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			dir, err := repoDir()
 			if err != nil {
@@ -25,7 +21,7 @@ func newInstallCmd() *cobra.Command {
 			return install(dir, dryRun)
 		},
 	}
-	cmd.Flags().BoolVarP(&dryRun, "dry-run", "n", false, "何が行われるかの確認のみ（変更なし）")
+	cmd.Flags().BoolVarP(&dryRun, "dry-run", "n", false, "確認のみ（変更しない）")
 	return cmd
 }
 
@@ -40,7 +36,7 @@ func install(dir string, dryRun bool) error {
 func newPathCmd() *cobra.Command {
 	return &cobra.Command{
 		Use:     "path",
-		Short:   "dotfiles リポジトリのパスを表示する",
+		Short:   "dotfiles のパスを表示する",
 		Example: `  cd "$(dots path)"`,
 		Args:    cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {

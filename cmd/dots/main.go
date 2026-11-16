@@ -8,6 +8,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/spf13/cobra"
 )
@@ -17,42 +18,40 @@ var assumeYes bool
 
 func main() {
 	root := &cobra.Command{
-		Use:   "dots",
-		Short: "dotfiles リポジトリを操作する",
-		Long: `dots — dotfiles リポジトリを操作するコマンド
-
-どこから実行しても dotfiles リポジトリに対して動く（今いるディレクトリは変わらない）。
-コミット・push の前には内容を見せて確認する（-y で確認を省略）。
-
-リポジトリの場所は次の順で決まる:
-  1. 環境変数 DOTFILES_DIR
-  2. ビルド時に埋め込まれたパス（install.sh を実行したリポジトリ）
-  3. ~/dotfiles`,
-		Example: `  dots status                 # 未コミットの変更・未 push のコミットを確認
-  dots commit "add lazygit"   # 差分を確認してコミット
-  dots push                   # 未 push のコミットを確認して push
-  dots sync                   # pull して install（別の Mac での変更を反映）
-  dots mise add lazygit       # mise に追加してコミット
-  dots brew add --cask arc    # Brewfile に追加してインストールしてコミット
-  cd "$(dots path)"           # dotfiles に移動`,
+		Use:           "dots",
 		SilenceUsage:  true,
 		SilenceErrors: true,
 	}
-	root.PersistentFlags().BoolVarP(&assumeYes, "yes", "y", false, "確認プロンプトをすべて y として進める")
+	root.PersistentFlags().BoolVarP(&assumeYes, "yes", "y", false, "確認を省略する")
+	// 補完スクリプトは completion.zsh が読み込むだけなので、help の一覧には出さない
+	root.CompletionOptions.HiddenDefaultCmd = true
+	// help は --help / -h で足りるので、サブコマンドの一覧には出さない
+	// （cobra の一覧テンプレートは help を隠していても表示するので、その条件を外す）
+	root.InitDefaultHelpCmd()
+	for _, c := range root.Commands() {
+		if c.Name() == "help" {
+			c.Hidden = true
+		}
+	}
+	root.SetUsageTemplate(strings.ReplaceAll(root.UsageTemplate(),
+		`(or .IsAvailableCommand (eq .Name "help"))`, `.IsAvailableCommand`))
 
 	root.AddCommand(
-		newCommitCmd(),
-		newPushCmd(),
-		newPullCmd(),
-		newSyncCmd(),
-		newStatusCmd(),
+		newUpgradeCmd(),
+		newListCmd(),
 		newInstallCmd(),
 		newPathCmd(),
-		newMiseCmd(),
-		newBrewCmd(),
+		newAddCmd(),
+		newRmCmd(),
+		newCmdCmd(),
 	)
 
 	if err := root.Execute(); err != nil {
+		// カスタムコマンドの終了コードはそのまま返す（メッセージは子が出している）
+		var code exitCodeError
+		if errors.As(err, &code) {
+			os.Exit(int(code))
+		}
 		if !errors.Is(err, errCanceled) {
 			fmt.Fprintln(os.Stderr, "dots:", err)
 		}

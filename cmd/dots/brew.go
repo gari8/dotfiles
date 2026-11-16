@@ -6,50 +6,7 @@ import (
 	"path/filepath"
 	"regexp"
 	"strings"
-
-	"github.com/spf13/cobra"
 )
-
-func newBrewCmd() *cobra.Command {
-	cmd := &cobra.Command{
-		Use:   "brew",
-		Short: "Brewfile に formula / cask を追加・削除する",
-	}
-
-	var addCask bool
-	var comment string
-	add := &cobra.Command{
-		Use:   "add <名前>...",
-		Short: "Brewfile に追加してインストールし、そのままコミットする",
-		Long: `名前が Homebrew にあるか確認してからインストールし、Brewfile に追記して、差分を確認してコミットする。
-formula は「CLI / システム寄りのツール」、cask は「GUIアプリ」セクションの末尾に入る。`,
-		Example: `  dots brew add tree
-  dots brew add --cask arc -m "ブラウザ"`,
-		Args: cobra.MinimumNArgs(1),
-		RunE: func(cmd *cobra.Command, args []string) error {
-			return brewAdd(kindOf(addCask), args, comment)
-		},
-	}
-	add.Flags().BoolVar(&addCask, "cask", false, "cask（GUIアプリ）として追加する")
-	add.Flags().StringVarP(&comment, "comment", "m", "", "行末に付ける説明コメント")
-
-	var rmCask bool
-	rm := &cobra.Command{
-		Use:     "rm <名前>...",
-		Aliases: []string{"remove"},
-		Short:   "Brewfile から削除してコミットし、アンインストールするか確認する",
-		Example: `  dots brew rm tree
-  dots brew rm --cask arc`,
-		Args: cobra.MinimumNArgs(1),
-		RunE: func(cmd *cobra.Command, args []string) error {
-			return brewRemove(kindOf(rmCask), args)
-		},
-	}
-	rm.Flags().BoolVar(&rmCask, "cask", false, "cask（GUIアプリ）を削除する")
-
-	cmd.AddCommand(add, rm)
-	return cmd
-}
 
 // brewKind は Brewfile の行の種類（brew = formula / cask）
 type brewKind string
@@ -113,7 +70,7 @@ func brewAdd(k brewKind, names []string, comment string) error {
 			continue
 		}
 		if !succeeds(dir, "brew", append([]string{"info"}, append(k.brewFlags(), name)...)...) {
-			return fmt.Errorf("%s %q が見つかりません（brew search %s で名前を確認してください）", k, name, name)
+			return fmt.Errorf("%s %q が見つかりません", k, name)
 		}
 		targets = append(targets, name)
 	}
@@ -171,7 +128,7 @@ func brewRemove(k brewKind, names []string) error {
 
 	// Brewfile から消してもアプリ本体は残るので、消すかどうかは別に確認する
 	if !confirm(strings.Join(names, " ") + " をアンインストールしますか?") {
-		fmt.Println("アンインストールはしませんでした（Brewfile からは削除済み）")
+		fmt.Println("アンインストールはしませんでした")
 		return nil
 	}
 	return run(dir, "brew", append([]string{"uninstall"}, append(k.brewFlags(), names...)...)...)

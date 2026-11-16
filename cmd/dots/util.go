@@ -20,7 +20,7 @@ var errCanceled = errors.New("canceled")
 
 // repoDir は dotfiles リポジトリの場所を返す
 func repoDir() (string, error) {
-	dir := os.Getenv("DOTFILES_DIR")
+	dir := os.Getenv("DOTS_ROOT")
 	if dir == "" {
 		dir = defaultDir
 	}
@@ -32,7 +32,7 @@ func repoDir() (string, error) {
 		dir = filepath.Join(home, "dotfiles")
 	}
 	if _, err := os.Stat(filepath.Join(dir, ".git")); err != nil {
-		return "", fmt.Errorf("dotfiles リポジトリが見つかりません: %s（DOTFILES_DIR で指定できます）", dir)
+		return "", fmt.Errorf("dotfiles が見つかりません: %s（DOTS_ROOT で指定）", dir)
 	}
 	return dir, nil
 }
