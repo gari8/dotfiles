@@ -1,18 +1,6 @@
-# Brewfile — GUIアプリとシステム寄りのツールはここで管理する
-# 反映: brew bundle --file=Brewfile（install.sh からも実行される）
+# Homebrew の cask と Mac App Store のアプリ（dots add --cask で追記される）
+# 反映: dots install
 
-# --- CLI / システム寄りのツール ---
-brew "git"
-brew "mise"
-brew "tree"       # ディレクトリ構成をツリー表示（mise の registry に無いので brew で入れる）
-brew "mas"        # Mac App Store の CLI（下の mas 行に必要。App Store へのサインインが前提）
-
-# --- ライブラリ ---
-# OpenCascade（OCCT）— CAD 用 C++ ライブラリ。追加時点の版は 7.9.3
-# Brewfile では版を固定できないので、7.9.x に留めたい場合は `brew pin opencascade` を使う
-brew "opencascade"
-
-# --- GUIアプリ ---
 cask "ghostty"    # ターミナルエミュレータ
 cask "clipy"      # クリップボード履歴（初回起動時にアクセシビリティの許可が必要）
 cask "rectangle"  # キーボードショートカットでウィンドウを整列（同上）
@@ -25,5 +13,5 @@ cask "docker-desktop"  # Docker Desktop（docker / docker compose コマンド�
 cask "discord"         # チャット
 cask "kicad"
 
-# --- Mac App Store ---
+# Mac App Store
 mas "Xcode", id: 497799835  # Unity の iOS / Mac ビルドに必要。容量が大きく時間がかかる

@@ -8,8 +8,8 @@ version = 1
 "config/ghostty" = "~/.config/ghostty"
 "config/mise" = "~/.config/mise"
 
-# [paths] and [brewfile] are left at their defaults (Brewfile,
-# config/mise/config.toml; sections headed "CLI" / "GUI").
+# [paths] is left at its defaults: brew/cli.Brewfile (formulae),
+# brew/gui.Brewfile (casks, mas apps) and config/mise/config.toml.
 
 # Custom commands: dots cmd <name> [args] (dots cmd list to see them)
 #   run:     shell command. A one-line command that does not use $1, "$@" etc.

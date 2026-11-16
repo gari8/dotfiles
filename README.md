@@ -4,7 +4,8 @@ macOS（Apple Silicon）の開発環境設定。
 
 ## 方針
 
-- **GUIアプリ・システム寄りのツール** → Homebrew（`Brewfile`）
+- **GUIアプリ** → Homebrew（`brew/gui.Brewfile`）
+- **mise に無いシステム寄りのツール・ライブラリ** → Homebrew（`brew/cli.Brewfile`）
 - **言語ランタイム・CLIツール** → mise（`config/mise/config.toml`）
 - **シェル設定** → 役割ごとにファイルを分割（`zsh/conf.d/`）
 - **マシン固有の設定・秘密情報** → `~/.zshrc.local`（リポジトリには含めない）
@@ -13,7 +14,9 @@ macOS（Apple Silicon）の開発環境設定。
 
 ```
 dotfiles/
-├── Brewfile                 # Homebrew で入れるもの（GUIアプリ・システムツール）
+├── brew/
+│   ├── cli.Brewfile         # Homebrew の formula（mise に無いツール・ライブラリ）
+│   └── gui.Brewfile         # Homebrew の cask・Mac App Store のアプリ
 ├── zsh/
 │   ├── .zprofile            # Homebrew の shellenv のみ
 │   ├── .zshrc               # conf.d/ の読み込みと mise の有効化
@@ -42,16 +45,16 @@ dotfiles/
 ## 新しい Mac でのセットアップ
 
 ```sh
-# 0. App Store にサインインしておく（Brewfile の mas 行で Xcode を入れるため）
+# 0. App Store にサインインしておく（gui.Brewfile の mas 行で Xcode を入れるため）
 
-# 1. Command Line Tools（git が入る。clone 時に自動でプロンプトが出る場合もある）
+# 1. Command Line Tools（git が入る）
 xcode-select --install
 
-# 2. リポジトリを取得
-git clone git@github.com:gari8/dotfiles.git ~/dotfiles
-
-# 3. dots を入れる（~/.local/bin/dots）
+# 2. dots を入れる（~/.local/bin/dots）
 curl -fsSL https://raw.githubusercontent.com/gari8/dotfiles-cli/main/install.sh | sh
+
+# 3. このリポジトリを ~/dotfiles に clone して登録
+~/.local/bin/dots init --from git@github.com:gari8/dotfiles.git
 
 # 4. セットアップ（まず -n で内容確認を推奨）
 ~/.local/bin/dots install -n
@@ -64,10 +67,10 @@ exec $SHELL -l
 `dots install` がやること（何度実行しても安全）:
 
 1. `dots.toml` の `[links]` のシンボリックリンクを作成（既存ファイルは `~/.dotfiles_backup/<日時>/` に退避）
-2. Homebrew が無ければ確認の上インストールし、`brew bundle` で Brewfile の足りないものを入れる
+2. Homebrew が無ければ確認の上インストールし、`brew bundle` で2つの Brewfile の足りないものを入れる
 3. `mise install` でグローバルツールを入れる
 
-`dots` 自体は mise ではなく `~/.local/bin/dots` に置く。更新するときは手順 3 の `curl ... | sh` をもう一度実行する。
+`dots` 自体は mise ではなく `~/.local/bin/dots` に置く。更新するときは手順 2 の `curl ... | sh` をもう一度実行する。
 
 ## dots コマンド
 
@@ -100,8 +103,8 @@ git の操作は `dots cmd status` / `commit` / `push` / `pull` / `sync` など�
 
 | 追加したいもの | 書く場所 | 反映コマンド |
 | --- | --- | --- |
-| GUIアプリ（cask） | `Brewfile` | `dots install` |
-| システム寄りのCLI | `Brewfile` | 同上 |
+| GUIアプリ（cask） | `brew/gui.Brewfile`（`dots add --cask`） | `dots install` |
+| mise に無いシステム寄りのCLI | `brew/cli.Brewfile`（`dots add --brew`） | 同上 |
 | 言語ランタイム・開発用CLI | `config/mise/config.toml` | `dots install` |
 | エイリアス・シェル設定 | `zsh/conf.d/*.zsh`（役割に合うファイル、無ければ新規作成） | `exec $SHELL -l` |
 | マシン固有・秘密情報 | `~/.zshrc.local`（コミットしない） | 同上 |
