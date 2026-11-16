@@ -78,7 +78,7 @@ exec $SHELL -l
 
 push するには GitHub への認証が必要。SSH 鍵を作って GitHub に登録し、`git -C ~/dotfiles remote set-url origin git@github.com:gari8/dotfiles.git` で SSH に切り替える（または `gh auth login`）。
 
-`dots` 自体は mise ではなく `~/.local/bin/dots` に置く。更新するときは手順 3 の `curl ... | sh` をもう一度実行する。
+`dots` 自体は mise ではなく `~/.local/bin/dots` に置く。更新は `dots upgrade --self`（`dots upgrade` の一覧にも出る）。
 
 ## この設定を取り込む（他の人向け）
 
