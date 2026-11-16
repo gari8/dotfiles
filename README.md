@@ -76,6 +76,52 @@ push するには GitHub への認証が必要。SSH 鍵を作って GitHub に�
 
 `dots` 自体は mise ではなく `~/.local/bin/dots` に置く。更新するときは手順 2 の `curl ... | sh` をもう一度実行する。
 
+## この設定を取り込む（他の人向け）
+
+どの方法も、先に [dots](https://github.com/gari8/dotfiles-cli) を入れておく。
+
+```sh
+curl -fsSL https://raw.githubusercontent.com/gari8/dotfiles-cli/main/install.sh | sh
+```
+
+### 丸ごと使う
+
+GitHub でこのリポジトリを fork し、**自分の fork** を取り込む（このリポジトリを直接 `--from` に渡すと、push 先が私のリポジトリになってしまう）。
+
+```sh
+dots init --from https://github.com/<あなた>/dotfiles.git
+dots install -n     # 何が起きるか確認してから
+dots install
+```
+
+- `dots init --from` は、リンクを張る前に `~/.zshrc` などどのファイルを置き換えるかと、カスタムコマンドの一覧を表示して確認する（置き換えたファイルは `~/.dotfiles_backup/<日時>/` に退避される）
+- `dots install` は Brewfile のアプリと mise のツールを**全部**入れる。要らないものは先に `brew/*.Brewfile` と `config/mise/config.toml` から消しておく
+
+### カスタムコマンドだけ欲しい
+
+`dots cmd status` / `commit` / `push` / `pull` / `sync` など（`dots.toml` に定義）を、自分の dotfiles に取り込む。中身を表示して、1つずつ確認してから追加される。
+
+```sh
+dots pick https://github.com/gari8/dotfiles.git                 # 一覧
+dots pick https://github.com/gari8/dotfiles.git commit push sync
+```
+
+### アプリや CLI ツールの一覧だけ欲しい
+
+Brewfile や mise の設定を、ファイルごと自分の dotfiles にコピーする（自分のファイルがすでにあれば、置き換えるか確認される）。
+
+```sh
+dots init --brewfile-gui https://github.com/gari8/dotfiles.git//brew/gui.Brewfile           # GUI アプリ
+dots init --brewfile-cli https://github.com/gari8/dotfiles.git//brew/cli.Brewfile           # Homebrew の CLI・ライブラリ
+dots init --mise-config https://github.com/gari8/dotfiles.git//config/mise/config.toml      # CLI ツール・言語ランタイム
+```
+
+ファイルごと置き換わるので、いくつかだけ欲しいときは中身を見て `dots add --cask <名前>` / `dots add --mise <名前>` で1つずつ足す方がよい。
+
+### シェルの設定だけ欲しい
+
+`zsh/conf.d/` のファイル（エイリアス・補完・履歴・プロンプト・fzf）は独立しているので、必要なものだけ自分の設定にコピーする。
+
 ## dots コマンド
 
 [gari8/dotfiles-cli](https://github.com/gari8/dotfiles-cli) の `dots` で、dotfiles をどこからでも操作する。確認は `-y` で省略できる。
