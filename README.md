@@ -20,6 +20,7 @@ dotfiles/
 │   └── conf.d/              # 役割別のシェル設定
 │       ├── aliases.zsh      #   エイリアス
 │       ├── completion.zsh   #   補完
+│       ├── fzf.zsh          #   fzf のキーバインド・ghq 連携
 │       ├── history.zsh      #   履歴
 │       ├── options.zsh      #   シェルオプション
 │       └── prompt.zsh       #   プロンプト（git ブランチ表示）
@@ -86,6 +87,15 @@ dotfiles をどこからでも操作できるコマンド。コミット・push 
 | `dots path` | dotfiles のパスを表示（`cd "$(dots path)"`） |
 
 詳しくは `dots --help` / `dots <コマンド> --help`。
+
+## キーバインド（fzf）
+
+| キー | やること |
+| --- | --- |
+| `Ctrl-G` | ghq のリポジトリを選んで `cd`（clone は `ghq get <owner>/<repo>`） |
+| `Ctrl-R` | コマンド履歴を検索 |
+| `Ctrl-T` | ファイルを選んで挿入 |
+| `Alt-C` | サブディレクトリを選んで `cd` |
 
 ## ツールを追加するときのルール
 
