@@ -7,5 +7,5 @@ if [[ -x /opt/homebrew/bin/brew ]]; then
   eval "$(/opt/homebrew/bin/brew shellenv)"
 fi
 
-# 自分で入れたコマンド（install.sh がビルドする dots など）
+# 自分で入れたコマンド（dotfiles-cli の install.sh が入れる dots など）
 export PATH="$HOME/.local/bin:$PATH"

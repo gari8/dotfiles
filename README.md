@@ -27,13 +27,10 @@ dotfiles/
 ├── config/
 │   ├── ghostty/config       # Ghostty（Option を Alt として使う・フォント・テーマ）
 │   └── mise/config.toml     # mise グローバルツール（node LTS, python, go, rust, gh, kubectl, rg, jq, yq, fd, bat, ghq）
-├── cmd/dots/                # dots コマンド（Go）
-├── dots.toml                # dots のカスタムコマンド
-└── scripts/
-    └── install.sh           # セットアップスクリプト（冪等・バックアップ付き）
+└── dots.toml                # dots の設定（シンボリックリンク・カスタムコマンド）
 ```
 
-シンボリックリンクの対応:
+シンボリックリンクの対応（`dots.toml` の `[links]`）:
 
 | リポジトリ内 | リンク先 |
 | --- | --- |
@@ -53,35 +50,37 @@ xcode-select --install
 # 2. リポジトリを取得
 git clone git@github.com:gari8/dotfiles.git ~/dotfiles
 
-# 3. セットアップ（まず dry-run で内容確認を推奨）
-~/dotfiles/scripts/install.sh --dry-run
-~/dotfiles/scripts/install.sh
+# 3. dots を入れる（~/.local/bin/dots）
+curl -fsSL https://raw.githubusercontent.com/gari8/dotfiles-cli/main/install.sh | sh
 
-# 4. シェルを再起動して反映
+# 4. セットアップ（まず -n で内容確認を推奨）
+~/.local/bin/dots install -n
+~/.local/bin/dots install
+
+# 5. シェルを再起動して反映
 exec $SHELL -l
 ```
 
-`install.sh` がやること:
+`dots install` がやること（何度実行しても安全）:
 
-1. 設定ファイルのシンボリックリンクを作成（既存ファイルは `~/.dotfiles_backup/<日時>/` に退避）
-2. Homebrew が無ければ確認の上インストール
-3. `brew bundle` で Brewfile の内容をインストール
-4. `mise install` でグローバルツールをインストール
-5. `dots` コマンドをビルドして `~/.local/bin/dots` に置く
+1. `dots.toml` の `[links]` のシンボリックリンクを作成（既存ファイルは `~/.dotfiles_backup/<日時>/` に退避）
+2. Homebrew が無ければ確認の上インストールし、`brew bundle` で Brewfile の足りないものを入れる
+3. `mise install` でグローバルツールを入れる
 
-何度実行しても安全です。セットアップ後は `dots install` でどこからでも再実行できます。
+`dots` 自体は mise ではなく `~/.local/bin/dots` に置く。更新するときは手順 3 の `curl ... | sh` をもう一度実行する。
 
 ## dots コマンド
 
-dotfiles をどこからでも操作できるコマンド。確認は `-y` で省略できる。
+[gari8/dotfiles-cli](https://github.com/gari8/dotfiles-cli) の `dots` で、dotfiles をどこからでも操作する。確認は `-y` で省略できる。
 
 | コマンド | やること |
 | --- | --- |
+| `dots install` | リンク作成・`brew bundle`・`mise install`（`-n` で確認のみ） |
+| `dots init [dir]` | dotfiles の場所を登録し、リンクを作成 |
 | `dots list [--mise\|--brew]` | 管理しているツールと導入状況（✓ / ✗）を表示 |
-| `dots install` | `install.sh` を実行（`--dry-run` で確認のみ） |
 | `dots upgrade [--mise\|--brew]` | 更新できるものを表示し、y で更新（`-n` で表示のみ、`-x a,b` で除外） |
-| `dots add --mise\|--brew\|--cask <名前>` | インストールして設定に追加し、コミット |
-| `dots rm --mise\|--brew\|--cask <名前>` | 設定から削除してコミット |
+| `dots add --mise\|--brew\|--cask <名前>` | インストールして設定に追加 |
+| `dots rm --mise\|--brew\|--cask <名前>` | 設定から削除（アンインストールは確認） |
 | `dots path` | dotfiles のパスを表示（`cd "$(dots path)"`） |
 | `dots cmd <名前>` | `dots.toml` のカスタムコマンドを実行（`dots cmd list` で一覧） |
 
@@ -101,14 +100,14 @@ git の操作は `dots cmd status` / `commit` / `push` / `pull` / `sync` など�
 
 | 追加したいもの | 書く場所 | 反映コマンド |
 | --- | --- | --- |
-| GUIアプリ（cask） | `Brewfile` | `brew bundle --file=~/dotfiles/Brewfile` |
+| GUIアプリ（cask） | `Brewfile` | `dots install` |
 | システム寄りのCLI | `Brewfile` | 同上 |
-| 言語ランタイム・開発用CLI | `config/mise/config.toml` | `mise install` |
+| 言語ランタイム・開発用CLI | `config/mise/config.toml` | `dots install` |
 | エイリアス・シェル設定 | `zsh/conf.d/*.zsh`（役割に合うファイル、無ければ新規作成） | `exec $SHELL -l` |
 | マシン固有・秘密情報 | `~/.zshrc.local`（コミットしない） | 同上 |
 
-追加は `dots add` を使うと、インストールからコミットまでまとめて行える。
-手で書き換えたときは `dots cmd commit <メッセージ>` → `dots cmd push`。
+追加は `dots add` を使うと、インストールと設定への追記をまとめて行える。
+コミットは `dots cmd commit <メッセージ>` → `dots cmd push`。
 
 - 名前は推測せず `brew search <名前>` / `mise registry | grep <名前>` で確認してから書く
 - プロジェクト固有のランタイムは、ここではなく各リポジトリの `mise.toml` に書く

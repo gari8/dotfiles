@@ -1,70 +1,83 @@
-# dots のカスタムコマンド。dots cmd <名前> [引数] で実行する（dots cmd list で一覧）
-#   run:     実行するコマンド（sh）。1行で $1 などを使っていなければ、引数は末尾に付く
-#            複数行や $1 / "$@" / "$*" を使うときは、引数の位置を自分で決める
-#   desc:    一覧に出す説明
-#   dir:     実行場所。root = dotfiles（既定）/ cwd = 今いる場所
-#   confirm: true なら実行前に確認する（-y で省略）
-# 使える環境変数: $DOTS_ROOT（dotfiles のパス）/ $DOTS_PWD（dots を実行した場所）
-# list / ls / add / rm / remove は予約名なので使えない
+# dots configuration (https://github.com/gari8/dotfiles-cli)
+version = 1
+
+# Symlinks created by dots init / dots install: "file in this repository" = "link target"
+[links]
+"zsh/.zprofile" = "~/.zprofile"
+"zsh/.zshrc" = "~/.zshrc"
+"config/ghostty" = "~/.config/ghostty"
+"config/mise" = "~/.config/mise"
+
+# [paths] and [brewfile] are left at their defaults (Brewfile,
+# config/mise/config.toml; sections headed "CLI" / "GUI").
+
+# Custom commands: dots cmd <name> [args] (dots cmd list to see them)
+#   run:     shell command. A one-line command that does not use $1, "$@" etc.
+#            gets the arguments appended; otherwise place them yourself.
+#   desc:    shown by dots cmd list
+#   dir:     working directory: root (this repository, default) or cwd
+#   confirm: ask before running (skipped with -y)
+# $DOTS_ROOT is this repository and $DOTS_PWD is where dots was run.
+# list / ls / add / rm / remove are reserved names.
 
 [cmd.status]
-desc = "未コミットの変更と未 push のコミットを表示"
+desc = "Show uncommitted changes and unpushed commits"
 run = '''
 git status -sb
 if git rev-parse @{u} >/dev/null 2>&1; then
   c=$(git log --oneline @{u}..HEAD)
-  if [ -n "$c" ]; then printf '\n未 push:\n%s\n' "$c"; fi
+  if [ -n "$c" ]; then printf '\nUnpushed:\n%s\n' "$c"; fi
 fi
 '''
 
 [cmd.commit]
-desc = "差分を確認してコミット（dots cmd commit メッセージ）"
+desc = "Review the diff and commit everything (dots cmd commit <message>)"
 run = '''
-if [ $# -eq 0 ]; then echo "usage: dots cmd commit <メッセージ>" >&2; exit 1; fi
-if [ -z "$(git status --porcelain)" ]; then echo "dotfiles に変更はありません"; exit 0; fi
+if [ $# -eq 0 ]; then echo "usage: dots cmd commit <message>" >&2; exit 1; fi
+if [ -z "$(git status --porcelain)" ]; then echo "No changes"; exit 0; fi
 git status --short
 git diff
-printf 'この内容でコミットしますか? [y/N] '; read a
-case "$a" in y|Y|yes) ;; *) echo "コミットしませんでした"; exit 1 ;; esac
+printf 'Commit these changes? [y/N] '; read a
+case "$a" in y|Y|yes) ;; *) echo "Commit canceled"; exit 1 ;; esac
 git add -A && git commit -m "$*"
 '''
 
 [cmd.push]
-desc = "未 push のコミットを確認して push"
+desc = "Review unpushed commits and push"
 run = '''
 st=$(git status --short)
-if [ -n "$st" ]; then printf '未コミットの変更があります（push されません）\n%s\n' "$st"; fi
+if [ -n "$st" ]; then printf 'Uncommitted changes (not pushed):\n%s\n' "$st"; fi
 if ! git rev-parse @{u} >/dev/null 2>&1; then
-  printf 'upstream がありません。origin に push しますか? [y/N] '; read a
-  case "$a" in y|Y|yes) exec git push -u origin HEAD ;; *) echo "push しませんでした"; exit 1 ;; esac
+  printf 'No upstream. Push to origin? [y/N] '; read a
+  case "$a" in y|Y|yes) exec git push -u origin HEAD ;; *) echo "Push canceled"; exit 1 ;; esac
 fi
 c=$(git log --oneline @{u}..HEAD)
-if [ -z "$c" ]; then echo "push するコミットはありません"; exit 0; fi
+if [ -z "$c" ]; then echo "Nothing to push"; exit 0; fi
 echo "$c"
-printf 'これらのコミットを push しますか? [y/N] '; read a
-case "$a" in y|Y|yes) exec git push ;; *) echo "push しませんでした"; exit 1 ;; esac
+printf 'Push these commits? [y/N] '; read a
+case "$a" in y|Y|yes) exec git push ;; *) echo "Push canceled"; exit 1 ;; esac
 '''
 
 [cmd.pull]
-desc = "リモートの変更を取り込む（反映は dots install）"
+desc = "Pull remote changes (apply them with dots install)"
 run = '''
 before=$(git rev-parse HEAD)
 git pull --ff-only || exit
-if [ "$before" != "$(git rev-parse HEAD)" ]; then printf '\n反映するには dots install\n'; fi
+if [ "$before" != "$(git rev-parse HEAD)" ]; then printf '\nRun dots install to apply them\n'; fi
 '''
 
 [cmd.sync]
-desc = "pull してから dots install"
+desc = "Pull, then run dots install"
 run = '''
 git pull --ff-only || exit
 echo
-exec "$DOTS_ROOT/scripts/install.sh"
+exec dots install
 '''
 
 [cmd.diff]
+desc = "Show the diff"
 run = "git diff"
-desc = "差分を表示"
 
 [cmd.log]
+desc = "Show recent commits"
 run = "git log --oneline -10"
-desc = "最近のコミット"
